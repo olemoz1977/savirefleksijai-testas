@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savirefleksijos testas vadovams</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --panel:#232E3D;
+    --panel-line:#334156;
+    --paper:#EDEAE2;
+    --text:#F3F1EC;
+    --muted:#9AA3AE;
+    --brass:#C08A3E;
+    --brass-dim:#8C6530;
+    --teal:#4C7B70;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:24px 16px 60px;
+  }
+  .app{
+    width:100%;
+    max-width:560px;
+  }
+  .topbar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:18px;
+  }
+  .lang-toggle{
+    background:transparent;
+    border:1px solid var(--panel-line);
+    color:var(--muted);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:13px;
+    letter-spacing:.03em;
+    cursor:pointer;
+  }
+  .lang-toggle:hover{ color:var(--text); border-color:var(--brass); }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:14px;
+    padding:28px 24px;
+  }
+  h1{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:26px;
+    line-height:1.25;
+    margin:0 0 6px;
+    font-weight:700;
+  }
+  .subtitle{
+    color:var(--muted);
+    font-size:14px;
+    margin:0 0 20px;
+  }
+  p{ line-height:1.55; font-size:15px; }
+  .btn{
+    display:inline-block;
+    background:var(--brass);
+    color:#1B1408;
+    border:none;
+    border-radius:8px;
+    padding:12px 22px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    letter-spacing:.01em;
+  }
+  .btn:hover{ background:#D19A4E; }
+  .btn.secondary{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--panel-line);
+    font-weight:500;
+  }
+  .btn.secondary:hover{ border-color:var(--brass); color:var(--brass); }
+  .btn:focus-visible, .lang-toggle:focus-visible, .likert-btn:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+  .btn-row{ display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; }
+
+  /* Gauge / progress */
+  .gauge-wrap{ margin-bottom:22px; }
+  .gauge-label{
+    display:flex; justify-content:space-between;
+    font-size:12px; color:var(--muted); margin-bottom:8px;
+    letter-spacing:.03em; text-transform:uppercase;
+  }
+  .gauge{
+    display:flex; gap:3px;
+  }
+  .tick{
+    height:6px; flex:1; border-radius:2px;
+    background:var(--panel-line);
+    transition:background .2s ease;
+  }
+  .tick.filled{ background:var(--brass); }
+
+  .question-text{
+    font-size:18px;
+    line-height:1.5;
+    margin:10px 0 26px;
+    font-family:Georgia,"Times New Roman",serif;
+  }
+  .likert{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .likert-btn{
+    flex:1;
+    aspect-ratio:1/1;
+    border-radius:10px;
+    border:1px solid var(--panel-line);
+    background:var(--ink);
+    color:var(--text);
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .likert-btn:hover{ border-color:var(--brass); }
+  .likert-btn.selected{
+    background:var(--brass);
+    border-color:var(--brass);
+    color:#1B1408;
+  }
+  .likert-endpoints{
+    display:flex; justify-content:space-between;
+    font-size:11.5px; color:var(--muted);
+    margin-bottom:26px;
+  }
+  .likert-endpoints span{ max-width:100px; }
+  .likert-endpoints span:last-child{ text-align:right; }
+
+  .nav-row{ display:flex; justify-content:space-between; margin-top:4px; }
+
+  /* Results */
+  .score-big{
+    font-family:Georgia,serif;
+    font-size:48px;
+    font-weight:700;
+    color:var(--brass);
+    line-height:1;
+    margin:6px 0 2px;
+  }
+  .score-sub{ color:var(--muted); font-size:14px; margin-bottom:18px; }
+  .band-title{ font-size:17px; font-weight:700; margin:0 0 8px; }
+
+  table.themes{
+    width:100%;
+    border-collapse:collapse;
+    margin:18px 0 6px;
+    font-size:13.5px;
+  }
+  table.themes td{
+    padding:7px 0;
+    border-bottom:1px solid var(--panel-line);
+  }
+  table.themes td:last-child{
+    text-align:right;
+    color:var(--brass);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .footer-note{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:22px;
+    line-height:1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <button class="lang-toggle" id="langToggle" type="button">EN</button>
+  </div>
+  <div class="card" id="card"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var THEMES = [
+    {key:"right",   lt:"Poreikis būti teisiam",        en:"Need to be right"},
+    {key:"listen",  lt:"Klausymasis",                   en:"Listening"},
+    {key:"respons", lt:"Atsakomybės prisiėmimas",       en:"Taking responsibility"},
+    {key:"grat",    lt:"Dėkingumas",                     en:"Gratitude"},
+    {key:"open",    lt:"Atvirumas kitų idėjoms",        en:"Openness to others' ideas"},
+    {key:"advice",  lt:"Patarimų dalijimas",             en:"Giving advice"},
+    {key:"admit",   lt:"Klaidų pripažinimas",           en:"Admitting mistakes"},
+    {key:"ego",     lt:"Savęs sureikšminimas",          en:"Self-importance"},
+    {key:"comm",    lt:"Bendravimo įpročiai",           en:"Communication habits"},
+    {key:"learn",   lt:"Mokymosi atvirumas",            en:"Openness to learning"}
+  ];
+
+  // index 0-based, reverse:true means score = 6 - value
+  var STATEMENTS = [
+    {theme:"listen",  reverse:false, lt:"Pokalbio metu dažniausiai išklausau žmogų iki galo, prieš pradėdamas formuluoti atsakymą.", en:"During a conversation, I usually listen to the other person fully before I start forming my reply."},
+    {theme:"ego",     reverse:true,  lt:"Man svarbu, kad kiti pastebėtų mano indėlį į bendrą rezultatą.", en:"It matters to me that others notice my contribution to a shared result."},
+    {theme:"respons", reverse:false, lt:"Kai projektas nepavyksta, pirmiausia analizuoju, ką pats galėjau padaryti kitaip.", en:"When a project fails, I first look at what I could have done differently myself."},
+    {theme:"advice",  reverse:false, lt:"Prieš duodamas patarimą, paklausiu, ar žmogui jo apskritai reikia.", en:"Before giving advice, I ask whether the person actually wants it."},
+    {theme:"right",   reverse:true,  lt:"Man svarbu, kad diskusijoje būtų pripažinta, jog buvau teisus.", en:"It matters to me that a discussion ends with people acknowledging I was right."},
+    {theme:"grat",    reverse:false, lt:"Reguliariai pasakau kolegoms ar komandos nariams, kad vertinu jų darbą.", en:"I regularly tell colleagues or team members that I value their work."},
+    {theme:"learn",   reverse:true,  lt:"Naują informaciją, prieštaraujančią mano patirčiai, dažniau vertinu skeptiškai nei su smalsumu.", en:"New information that contradicts my experience, I tend to meet with skepticism rather than curiosity."},
+    {theme:"admit",   reverse:false, lt:"Kai suklystu prieš komandą, garsiai tai įvardiju.", en:"When I make a mistake in front of the team, I say so openly."},
+    {theme:"comm",    reverse:true,  lt:"Pokalbiuose dažnai pertraukiu kitus, kai noriu greitai pasakyti savo mintį.", en:"In conversations, I often interrupt others when I want to get my point across quickly."},
+    {theme:"open",    reverse:true,  lt:"Išgirdęs idėją, kuri prieštarauja mano požiūriui, dažniausiai iškart pastebiu jos trūkumus.", en:"When I hear an idea that conflicts with my own view, I usually spot its flaws first."},
+    {theme:"ego",     reverse:false, lt:"Ramiai priimu, kai kiti komandos nariai sulaukia daugiau dėmesio ar pripažinimo nei aš.", en:"I'm at ease when other team members get more attention or recognition than I do."},
+    {theme:"right",   reverse:false, lt:"Man priimtina baigti diskusiją nesutarus, kas buvo teisus.", en:"I'm fine ending a discussion without settling who was right."},
+    {theme:"grat",    reverse:false, lt:"Dėkoju žmonėms už jų pastangas net tada, kai rezultatas nėra tobulas.", en:"I thank people for their effort even when the result isn't perfect."},
+    {theme:"advice",  reverse:false, lt:"Kai kolega pasirenka kitokį sprendimą, nei aš būčiau pataręs, tai manęs netrikdo.", en:"When a colleague chooses a different solution than the one I would have advised, it doesn't bother me."},
+    {theme:"listen",  reverse:true,  lt:"Kol kitas žmogus kalba, dažnai jau galvoju, ką atsakysiu.", en:"While someone else is still talking, I'm often already thinking about my reply."},
+    {theme:"respons", reverse:true,  lt:"Kai kas nors nepavyksta, dažniausiai pirmiausia pagalvoju apie aplinkybes ar kitų žmonių indėlį.", en:"When something goes wrong, I usually think first about the circumstances or other people's part in it."},
+    {theme:"learn",   reverse:false, lt:"Pats iniciatyviai paprašau grįžtamojo ryšio apie savo darbą, nelaukdamas progos ar raginimo.", en:"I proactively ask for feedback on my work, without waiting for an opportunity or a prompt."},
+    {theme:"admit",   reverse:false, lt:"Kai suklystu, apie tai pasakau ir tiems, kuriuos tai paveikė, ne tik sau.", en:"When I make a mistake, I tell the people it affected, not just acknowledge it to myself."},
+    {theme:"comm",    reverse:false, lt:"Susirinkimuose dažniau leidžiu kitiems pirmiems išsakyti nuomonę.", en:"In meetings, I tend to let others share their opinion first."},
+    {theme:"open",    reverse:false, lt:"Kai kito žmogaus idėja skiriasi nuo mano, stengiuosi iki galo suprasti jos logiką prieš vertindamas.", en:"When someone else's idea differs from mine, I try to fully understand its logic before judging it."}
+  ];
+
+  var SCALE = {
+    lt:["Visiškai nesutinku","Greičiau nesutinku","Nei sutinku, nei nesutinku","Greičiau sutinku","Visiškai sutinku"],
+    en:["Strongly disagree","Somewhat disagree","Neither agree nor disagree","Somewhat agree","Strongly agree"]
+  };
+
+  var BANDS = [
+    {min:20,max:46,
+      lt:{title:"20–46 balai", text:"Jūsų atsakymai rodo, kad nemažai kasdienių situacijų — klausymasis, atsakomybės prisiėmimas, atvirumas kitų požiūriui — jums gali kelti iššūkį dažniau, nei norėtumėte. Verta pasirinkti 1–2 sritis iš sąrašo aukščiau ir stebėti save savaitę realiose situacijose."},
+      en:{title:"20–46 points", text:"Your answers suggest that quite a few everyday situations — listening, taking responsibility, staying open to other viewpoints — may challenge you more often than you'd like. It's worth picking 1–2 areas from the list above and observing yourself in real situations over the coming week."}
+    },
+    {min:47,max:73,
+      lt:{title:"47–73 balai", text:"Jūsų elgesys šiose srityse svyruoja priklausomai nuo konteksto — kai kuriose situacijose veikiate atvirai ir refleksyviai, kitose grįžtate prie įprastų reakcijų. Naudinga klausimas: kuriose konkrečiose situacijose (pvz., įtemptas susirinkimas, kritika iš viršininko) jūsų elgesys labiausiai nukrypsta nuo to, kokio norėtumėte?"},
+      en:{title:"47–73 points", text:"Your behavior in these areas varies with context — in some situations you act openly and reflectively, in others you fall back on familiar reactions. A useful question: in which specific situations (a tense meeting, criticism from a manager) does your behavior drift furthest from how you'd like to act?"}
+    },
+    {min:74,max:100,
+      lt:{title:"74–100 balų", text:"Jūs save vertinate kaip dažnai veikiantį šiose srityse atvirai, atsakingai ir įsiklausančiai. Verta patikrinti šį savęs vertinimą su kitais: paklauskite 1–2 žmonių iš savo aplinkos, ar jų patirtis su jumis sutampa su šiuo rezultatu. Aukšti savęs vertinimo balai kartais atspindi ne tik realų elgesį, bet ir tai, kaip norime save matyti."},
+      en:{title:"74–100 points", text:"You see yourself as frequently acting openly, responsibly, and attentively in these areas. It's worth checking this self-assessment against others: ask one or two people close to you whether their experience of you matches this result. High self-assessment scores sometimes reflect not just actual behavior, but also how we want to see ourselves."}
+    }
+  ];
+
+  var UI = {
+    lt:{
+      title:"Savirefleksijos testas vadovams",
+      subtitle:"~3 min. Tai nėra diagnostinis ar mokslinis asmenybės testas.",
+      intro:"Perskaitykite kiekvieną teiginį ir įvertinkite, kiek jis atitinka jūsų kasdienį elgesį — ne tai, koks norėtumėte būti. Nėra teisingų ar neteisingų atsakymų.",
+      start:"Pradėti",
+      back:"Atgal",
+      question:"Klausimas",
+      resultsTitle:"Jūsų rezultatas",
+      totalLabel:"Bendras balas",
+      themeTitle:"Suskirstymas pagal sritis",
+      download:"Atsisiųsti PDF",
+      restart:"Pradėti iš naujo",
+      footer:"Duomenys nebuvo išsaugoti jokiame serveryje — viskas skaičiuojama jūsų naršyklėje.",
+      pdfDate:"Data"
+    },
+    en:{
+      title:"Self-Reflection Test for Leaders",
+      subtitle:"~3 min. This is not a diagnostic or scientific personality test.",
+      intro:"Read each statement and rate how well it matches your everyday behavior — not how you'd like to be. There are no right or wrong answers.",
+      start:"Start",
+      back:"Back",
+      question:"Question",
+      resultsTitle:"Your result",
+      totalLabel:"Total score",
+      themeTitle:"Breakdown by area",
+      download:"Download PDF",
+      restart:"Start over",
+      footer:"No data was saved to any server — everything is calculated in your browser.",
+      pdfDate:"Date"
+    }
+  };
+
+  var STORAGE_KEY = "selfrefl_progress_v1";
+
+  var state = {
+    lang:"lt",
+    screen:"intro", // intro | test | results
+    index:0,
+    answers:new Array(STATEMENTS.length).fill(null)
+  };
+
+  function loadProgress(){
+    try{
+      var raw = sessionStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var parsed = JSON.parse(raw);
+      if(parsed && Array.isArray(parsed.answers) && parsed.answers.length === STATEMENTS.length){
+        state.screen = parsed.screen || "intro";
+        state.index = parsed.index || 0;
+        state.answers = parsed.answers;
+      }
+    }catch(e){ /* ignore corrupt storage */ }
+  }
+
+  function saveProgress(){
+    try{
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        screen:state.screen, index:state.index, answers:state.answers
+      }));
+    }catch(e){ /* storage unavailable, fail silently */ }
+  }
+
+  function t(){ return UI[state.lang]; }
+
+  function themeName(key){
+    var th = THEMES.filter(function(x){return x.key===key;})[0];
+    return th ? th[state.lang] : key;
+  }
+
+  function computeResults(){
+    var total = 0;
+    var byTheme = {};
+    THEMES.forEach(function(th){ byTheme[th.key] = 0; });
+    STATEMENTS.forEach(function(st, i){
+      var raw = state.answers[i];
+      var val = st.reverse ? (6 - raw) : raw;
+      total += val;
+      byTheme[st.theme] += val;
+    });
+    var band = BANDS.filter(function(b){ return total>=b.min && total<=b.max; })[0];
+    return {total:total, byTheme:byTheme, band:band};
+  }
+
+  function render(){
+    document.documentElement.lang = state.lang;
+    document.getElementById("langToggle").textContent = state.lang === "lt" ? "EN" : "LT";
+    var card = document.getElementById("card");
+    card.innerHTML = "";
+
+    if(state.screen === "intro") renderIntro(card);
+    else if(state.screen === "test") renderTest(card);
+    else renderResults(card);
+
+    saveProgress();
+  }
+
+  function renderIntro(card){
+    var h = document.createElement("h1"); h.textContent = t().title;
+    var sub = document.createElement("p"); sub.className = "subtitle"; sub.textContent = t().subtitle;
+    var intro = document.createElement("p"); intro.textContent = t().intro;
+    var startBtn = document.createElement("button");
+    startBtn.className = "btn"; startBtn.type = "button"; startBtn.textContent = t().start;
+    startBtn.addEventListener("click", function(){
+      state.screen = "test"; state.index = 0; render();
+    });
+    var row = document.createElement("div"); row.className = "btn-row"; row.appendChild(startBtn);
+
+    card.appendChild(h); card.appendChild(sub); card.appendChild(intro); card.appendChild(row);
+  }
+
+  function renderTest(card){
+    var i = state.index;
+    var st = STATEMENTS[i];
+
+    var gaugeWrap = document.createElement("div"); gaugeWrap.className = "gauge-wrap";
+    var gLabel = document.createElement("div"); gLabel.className = "gauge-label";
+    var leftSpan = document.createElement("span");
+    leftSpan.textContent = t().question + " " + (i+1) + " / " + STATEMENTS.length;
+    gLabel.appendChild(leftSpan);
+    var gauge = document.createElement("div"); gauge.className = "gauge";
+    for(var k=0;k<STATEMENTS.length;k++){
+      var tick = document.createElement("div");
+      tick.className = "tick" + (k <= i ? " filled" : "");
+      gauge.appendChild(tick);
+    }
+    gaugeWrap.appendChild(gLabel); gaugeWrap.appendChild(gauge);
+
+    var qText = document.createElement("div"); qText.className = "question-text";
+    qText.textContent = st[state.lang];
+
+    var likert = document.createElement("div"); likert.className = "likert";
+    for(var v=1; v<=5; v++){
+      (function(v){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "likert-btn" + (state.answers[i]===v ? " selected" : "");
+        b.textContent = v;
+        b.setAttribute("aria-label", SCALE[state.lang][v-1]);
+        b.addEventListener("click", function(){
+          state.answers[i] = v;
+          if(i < STATEMENTS.length - 1){
+            state.index = i + 1;
+          } else {
+            state.screen = "results";
+          }
+          render();
+        });
+        likert.appendChild(b);
+      })(v);
+    }
+
+    var endpoints = document.createElement("div"); endpoints.className = "likert-endpoints";
+    var e1 = document.createElement("span"); e1.textContent = SCALE[state.lang][0];
+    var e2 = document.createElement("span"); e2.textContent = SCALE[state.lang][4];
+    endpoints.appendChild(e1); endpoints.appendChild(e2);
+
+    var navRow = document.createElement("div"); navRow.className = "nav-row";
+    var backBtn = document.createElement("button");
+    backBtn.type = "button"; backBtn.className = "btn secondary"; backBtn.textContent = t().back;
+    backBtn.disabled = (i === 0);
+    backBtn.style.visibility = (i===0) ? "hidden" : "visible";
+    backBtn.addEventListener("click", function(){
+      state.index = Math.max(0, i-1); render();
+    });
+    navRow.appendChild(backBtn);
+
+    card.appendChild(gaugeWrap);
+    card.appendChild(qText);
+    card.appendChild(likert);
+    card.appendChild(endpoints);
+    card.appendChild(navRow);
+  }
+
+  function renderResults(card){
+    var r = computeResults();
+    var band = r.band[state.lang];
+
+    var h = document.createElement("h1"); h.textContent = t().resultsTitle;
+    var totalLabel = document.createElement("div"); totalLabel.className = "score-sub"; totalLabel.textContent = t().totalLabel;
+    var big = document.createElement("div"); big.className = "score-big"; big.textContent = r.total + " / 100";
+    var bandTitle = document.createElement("div"); bandTitle.className = "band-title"; bandTitle.textContent = band.title;
+    var bandText = document.createElement("p"); bandText.textContent = band.text;
+
+    var themeTitle = document.createElement("div"); themeTitle.className = "band-title"; themeTitle.style.marginTop="18px"; themeTitle.textContent = t().themeTitle;
+    var table = document.createElement("table"); table.className = "themes";
+    THEMES.forEach(function(th){
+      var tr = document.createElement("tr");
+      var td1 = document.createElement("td"); td1.textContent = th[state.lang];
+      var td2 = document.createElement("td"); td2.textContent = r.byTheme[th.key] + " / 10";
+      tr.appendChild(td1); tr.appendChild(td2);
+      table.appendChild(tr);
+    });
+
+    var pdfBtn = document.createElement("button");
+    pdfBtn.type = "button"; pdfBtn.className = "btn"; pdfBtn.textContent = t().download;
+    pdfBtn.addEventListener("click", function(){ downloadPdf(r); });
+
+    var restartBtn = document.createElement("button");
+    restartBtn.type = "button"; restartBtn.className = "btn secondary"; restartBtn.textContent = t().restart;
+    restartBtn.addEventListener("click", function(){
+      state.screen = "intro"; state.index = 0; state.answers = new Array(STATEMENTS.length).fill(null);
+      try{ sessionStorage.removeItem(STORAGE_KEY); }catch(e){}
+      render();
+    });
+
+    var row = document.createElement("div"); row.className = "btn-row";
+    row.appendChild(pdfBtn); row.appendChild(restartBtn);
+
+    var footer = document.createElement("div"); footer.className = "footer-note"; footer.textContent = t().footer;
+
+    card.appendChild(h);
+    card.appendChild(totalLabel);
+    card.appendChild(big);
+    card.appendChild(bandTitle);
+    card.appendChild(bandText);
+    card.appendChild(themeTitle);
+    card.appendChild(table);
+    card.appendChild(row);
+    card.appendChild(footer);
+  }
+
+  function downloadPdf(r){
+    var jsPDFCtor = window.jspdf && window.jspdf.jsPDF;
+    if(!jsPDFCtor){ alert("PDF library failed to load."); return; }
+    var doc = new jsPDFCtor({unit:"pt", format:"a4"});
+    var band = r.band[state.lang];
+    var margin = 48;
+    var y = margin;
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var maxWidth = pageWidth - margin*2;
+
+    doc.setFont("times","bold"); doc.setFontSize(18);
+    doc.text(t().title, margin, y); y += 26;
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,90,90);
+    var dateStr = new Date().toLocaleDateString(state.lang === "lt" ? "lt-LT" : "en-GB");
+    doc.text(t().pdfDate + ": " + dateStr, margin, y); y += 24;
+
+    doc.setTextColor(20,20,20);
+    doc.setFont("helvetica","bold"); doc.setFontSize(13);
+    doc.text(t().totalLabel + ": " + r.total + " / 100", margin, y); y += 20;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text(band.title, margin, y); y += 18;
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(11);
+    var lines = doc.splitTextToSize(band.text, maxWidth);
+    doc.text(lines, margin, y); y += lines.length * 14 + 16;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text(t().themeTitle, margin, y); y += 18;
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(11);
+    THEMES.forEach(function(th){
+      var label = th[state.lang];
+      var val = r.byTheme[th.key] + " / 10";
+      doc.text(label, margin, y);
+      doc.text(val, pageWidth - margin, y, {align:"right"});
+      y += 16;
+    });
+
+    y += 20;
+    doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(120,120,120);
+    var footerLines = doc.splitTextToSize(t().footer, maxWidth);
+    doc.text(footerLines, margin, y);
+
+    doc.save("savirefleksijos-rezultatas.pdf");
+  }
+
+  document.getElementById("langToggle").addEventListener("click", function(){
+    state.lang = state.lang === "lt" ? "en" : "lt";
+    render();
+  });
+
+  loadProgress();
+  render();
+})();
+</script>
+</body>
+</html>
